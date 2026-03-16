@@ -40,7 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/attention/*
-/suggestions/*
-/node_modules/.prisma/*
+/attention
+/suggestions
+/node_modules/.prisma
 pnpm-lock.yaml
+/prompt
