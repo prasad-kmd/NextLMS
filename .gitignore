@@ -43,3 +43,4 @@ next-env.d.ts
 /attention/*
 /suggestions/*
 /node_modules/.prisma/*
+pnpm-lock.yaml
