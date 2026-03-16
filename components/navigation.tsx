@@ -4,7 +4,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   FileText, BookOpen, GitBranch, Newspaper, Home, Menu, X, Mail,
-  ChevronLeft, ChevronRight, PanelLeft, Wrench, UserRound, Info, Book
+  ChevronLeft, ChevronRight, PanelLeft, Wrench, UserRound, Info, Book,
+  GraduationCap, LayoutDashboard
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -12,6 +13,7 @@ import { WebShareButton } from "./web-share-button"
 import { PushNotificationManager } from "./push-notification-manager"
 import { useSidebar } from "./sidebar-context"
 import { FloatingNavbar } from "./floating-navbar"
+import { useSession } from "next-auth/react"
 import {
   Tooltip,
   TooltipContent,
@@ -36,6 +38,7 @@ const secondaryNav = [
 
 export function Navigation() {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isCollapsed, toggleSidebar } = useSidebar()
 
@@ -131,6 +134,20 @@ export function Navigation() {
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
             {primaryNav.map(renderNavItem)}
+
+            {session && (
+              <>
+                <hr className="my-2 border-border" />
+                <div className={cn("px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground", isCollapsed && "hidden")}>
+                  LMS
+                </div>
+                {renderNavItem({ name: "Dashboard", href: "/dashboard/student", icon: LayoutDashboard })}
+                {(session.user.role === "ADMIN" || session.user.role === "TEACHER") &&
+                  renderNavItem({ name: "Teaching", href: "/teacher/courses", icon: GraduationCap })
+                }
+              </>
+            )}
+
             <hr className="my-2 border-border" />
             <PushNotificationManager isCollapsed={isCollapsed} />
             <WebShareButton isCollapsed={isCollapsed} />

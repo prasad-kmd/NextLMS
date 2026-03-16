@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, BookOpen, GitBranch, Newspaper } from "lucide-react"
+import { FileText, BookOpen, GitBranch, Newspaper, GraduationCap } from "lucide-react"
 import FeaturedHero, { type HeroItem } from "@/components/featured-hero"
 import MagicBentoClient from "@/components/magic-bento-client"
 import { getContentByType } from "@/lib/content"
@@ -71,8 +71,36 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <FeaturedHero items={heroItems} />
+      {/* Hero Section - Simplified for LMS Focus */}
+      <section className="relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center lg:px-8">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_50%,var(--color-primary-500)_0%,transparent_100%)] opacity-20" />
+        <div className="mx-auto max-w-4xl">
+          <h1 className="mb-6 text-5xl font-bold tracking-tight philosopher lg:text-7xl">
+            Transform Your Engineering <span className="text-primary">Learning Journey</span>
+          </h1>
+          <p className="mx-auto mb-10 max-w-2xl text-xl text-muted-foreground local-inter leading-relaxed">
+            A comprehensive Personal LMS and Portfolio for Engineers. Document research, share insights, and master mechatronics through our curated courses.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/dashboard/student"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-lg font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-primary/30"
+            >
+              <GraduationCap className="h-6 w-6" />
+              Start Learning
+            </Link>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-8 py-4 text-lg font-bold backdrop-blur-md transition-all hover:bg-card hover:scale-105"
+            >
+              Explore Blog
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Original Hero Hidden but preserved in code above (featuredHeroItems) */}
+      {/* <FeaturedHero items={heroItems} /> */}
 
       {/* Content Sections Grid */}
       <section className="px-6 py-20 lg:px-8">

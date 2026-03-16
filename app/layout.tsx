@@ -119,6 +119,7 @@ import { CustomCursor } from "@/components/custom-cursor";
 import { CustomContextMenu } from "@/components/custom-context-menu";
 import { Footer } from "@/components/footer";
 import ClickSpark from "@/components/ClickSpark";
+import { NextAuthProvider } from "@/components/providers/session-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -254,43 +255,45 @@ export default function RootLayout({
       className={`${amoriaregular.variable} ${mozillaHeadline.variable} ${philosopher.variable} ${googleSans.variable} ${mozillaText.variable} ${notoSans.variable} ${notoSansDisplay.variable} ${notoSerifSinhala.variable} ${roboto.variable} ${spaceMono.variable} ${localInter.variable} ${localJetBrainsMono.variable}`}
     >
       <body className="antialiased selection:bg-brand-200 selection:text-brand-900">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TooltipProvider>
-            <SidebarProvider>
-              <BookmarksProvider>
-                <ClickSpark
-                  sparkColor="#ffffff"
-                  sparkSize={10}
-                  sparkRadius={15}
-                  sparkCount={8}
-                  duration={400}
-                  easing="linear"
-                  extraScale={1.5}
-                  // className="min-h-screen flex flex-col"
-                >
-                  {/* <CustomCursor /> */}
-                  <CustomContextMenu />
-                  <FloatingNavbar className="hidden lg:flex" />
-                  <Navigation />
-                  <main className="transition-[padding] duration-300 lg:pl-[var(--sidebar-width,256px)]">
-                    {children}
-                    <Footer />
-                  </main>
-                  <ScrollToTop />
-                  <Toaster position="bottom-right" richColors />
-                  <ConnectivityListener />
-                  <SpeedInsights />
-                  <ServiceWorkerRegistrar />
-                </ClickSpark>
-              </BookmarksProvider>
-            </SidebarProvider>
-          </TooltipProvider>
-        </ThemeProvider>
+        <NextAuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TooltipProvider>
+              <SidebarProvider>
+                <BookmarksProvider>
+                  <ClickSpark
+                    sparkColor="#ffffff"
+                    sparkSize={10}
+                    sparkRadius={15}
+                    sparkCount={8}
+                    duration={400}
+                    easing="linear"
+                    extraScale={1.5}
+                    // className="min-h-screen flex flex-col"
+                  >
+                    {/* <CustomCursor /> */}
+                    <CustomContextMenu />
+                    <FloatingNavbar className="hidden lg:flex" />
+                    <Navigation />
+                    <main className="transition-[padding] duration-300 lg:pl-[var(--sidebar-width,256px)]">
+                      {children}
+                      <Footer />
+                    </main>
+                    <ScrollToTop />
+                    <Toaster position="bottom-right" richColors />
+                    <ConnectivityListener />
+                    <SpeedInsights />
+                    <ServiceWorkerRegistrar />
+                  </ClickSpark>
+                </BookmarksProvider>
+              </SidebarProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );
