@@ -20,7 +20,7 @@ export default async function TeacherDashboard() {
       </div>
       <h2 className="text-2xl font-semibold mb-4">Your Courses</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {courses.map((course) => (
+        {courses.map((course: any) => (
           <Card key={course.id}><CardHeader><CardTitle>{course.title}</CardTitle></CardHeader><CardContent><Link href={`/teacher/courses/${course.id}`}><Button variant="outline">Manage</Button></Link></CardContent></Card>
         ))}
       </div>

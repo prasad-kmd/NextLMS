@@ -21,9 +21,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
         <form action={`/api/courses/${courseId}/enroll`} method="POST"><Button type="submit">Enroll</Button></form>
       ) : (
         <div className="space-y-4">
-          {course.modules.map((m) => (
+          {course.modules.map((m: any) => (
             <Card key={m.id}><CardHeader><CardTitle>{m.title}</CardTitle></CardHeader><CardContent>
-              {m.lectures.map((l) => (<div key={l.id}><Link href={`/courses/${courseId}/lectures/${l.id}`} className="text-blue-500">{l.title}</Link></div>))}
+              {m.lectures.map((l: any) => (<div key={l.id}><Link href={`/courses/${courseId}/lectures/${l.id}`} className="text-blue-500">{l.title}</Link></div>))}
             </CardContent></Card>
           ))}
         </div>

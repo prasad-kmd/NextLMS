@@ -18,7 +18,7 @@ export default async function CourseManagePage({ params }: { params: Promise<{ c
       <Link href="/teacher/dashboard" className="mb-4 flex items-center"><ArrowLeft className="mr-2 h-4 w-4" />Back</Link>
       <h1 className="text-3xl font-bold">{course.title}</h1>
       <div className="mt-8 space-y-4">
-        {course.modules.map((m) => (
+        {course.modules.map((m: any) => (
           <Card key={m.id}><CardHeader><CardTitle>{m.title}</CardTitle></CardHeader></Card>
         ))}
       </div>

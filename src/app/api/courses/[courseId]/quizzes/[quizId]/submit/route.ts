@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cou
   const quiz = await db.quiz.findUnique({ where: { id: quizId }, include: { questions: true } })
   if (!quiz) return new NextResponse("Not found", { status: 404 })
   let correct = 0
-  quiz.questions.forEach(q => { if (answers[q.id] === q.correctAnswer) correct++ })
+  quiz.questions.forEach((q: any) => { if (answers[q.id] === q.correctAnswer) correct++ })
   const score = Math.round((correct / quiz.questions.length) * 100)
   const res = await db.quizResult.create({ data: { userId: (session.user as any).id, quizId, score, passed: score >= 60 } })
   return NextResponse.json(res)
