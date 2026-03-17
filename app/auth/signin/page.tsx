@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -74,6 +75,10 @@ export default function SignInPage() {
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
+        <div className="text-center text-sm">
+           <span className="text-muted-foreground">Don't have an account? </span>
+           <Link href="/auth/signup" className="font-bold text-primary hover:underline">Sign Up</Link>
+        </div>
       </div>
     </div>
   );

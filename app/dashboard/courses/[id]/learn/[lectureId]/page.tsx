@@ -7,8 +7,8 @@ import Link from "next/link";
 import { CheckCircle, Circle, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default async function LearningPage({ params }: { params: { id: string, lectureId: string } }) {
-  const { id: courseId, lectureId } = params;
+export default async function LearningPage({ params }: { params: Promise<{ id: string, lectureId: string }> }) {
+  const { id: courseId, lectureId } = await params;
   const session = await getServerSession(authOptions);
   if (!session) redirect("/auth/signin");
 

@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { CourseEditor } from "./course-editor";
 
-export default async function TeacherCourseDetailsPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function TeacherCourseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const course = await db.course.findUnique({
     where: { id },
     include: {

@@ -1,19 +1,22 @@
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 
-export default async function CourseLearnRedirectPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function CourseLearnRedirectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
-  const firstLecture = await db.lecture.findFirst({
-    where: { module: { courseId: id } },
-    orderBy: [
-      { module: { order: "asc" } },
-      { order: "asc" }
-    ]
-  });
+  try {
+    const firstLecture = await db.lecture.findFirst({
+      where: { module: { courseId: id } },
+      orderBy: [
+        { module: { order: "asc" } },
+        { order: "asc" }
+      ]
+    });
 
-  if (!firstLecture) {
-    // Check if there is a quiz if no lecture exists
+    if (firstLecture) {
+      return redirect(`/dashboard/courses/${id}/learn/${firstLecture.id}`);
+    }
+
     const firstQuiz = await db.quiz.findFirst({
       where: { module: { courseId: id } },
       orderBy: [
@@ -23,11 +26,11 @@ export default async function CourseLearnRedirectPage({ params }: { params: { id
     });
 
     if (firstQuiz) {
-       return redirect(`/dashboard/courses/${id}/quiz/${firstQuiz.id}`);
+      return redirect(`/dashboard/courses/${id}/quiz/${firstQuiz.id}`);
     }
-
-    return redirect("/dashboard/student");
+  } catch (error) {
+    console.error("Redirect Error:", error);
   }
 
-  return redirect(`/dashboard/courses/${id}/learn/${firstLecture.id}`);
+  return redirect("/dashboard/student");
 }

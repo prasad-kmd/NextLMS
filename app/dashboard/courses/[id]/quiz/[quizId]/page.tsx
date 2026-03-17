@@ -6,8 +6,8 @@ import { Quiz } from "@/components/quiz";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-export default async function QuizPage({ params }: { params: { id: string, quizId: string } }) {
-  const { id: courseId, quizId } = params;
+export default async function QuizPage({ params }: { params: Promise<{ id: string, quizId: string }> }) {
+  const { id: courseId, quizId } = await params;
   const session = await getServerSession(authOptions);
   if (!session) redirect("/auth/signin");
 
