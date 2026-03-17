@@ -1,7 +1,7 @@
 "use client"
 
 import { useTheme } from "next-themes"
-import { Sun, Moon, Bookmark, Share2, LayoutGrid, LogIn, LogOut, User } from "lucide-react"
+import { Sun, Moon, Bookmark, Share2, LayoutGrid, LogIn, LogOut, User, UserPlus } from "lucide-react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -179,22 +179,40 @@ export function FloatingNavbar({ className, isMobileSidebar = false }: FloatingN
                   )}
                </Tooltip>
             ) : (
-               <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                     <Link
-                        href="/auth/signin"
-                        className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors relative group google-sans"
-                        aria-label="Sign In"
-                     >
-                        <LogIn className="h-5 w-5" />
-                     </Link>
-                  </TooltipTrigger>
-                  {!isMobileSidebar && (
-                     <TooltipContent side="bottom" sideOffset={8}>
-                        Sign In
-                     </TooltipContent>
-                  )}
-               </Tooltip>
+               <>
+                  <Tooltip delayDuration={0}>
+                     <TooltipTrigger asChild>
+                        <Link
+                           href="/auth/signup"
+                           className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors relative group google-sans"
+                           aria-label="Sign Up"
+                        >
+                           <UserPlus className="h-5 w-5" />
+                        </Link>
+                     </TooltipTrigger>
+                     {!isMobileSidebar && (
+                        <TooltipContent side="bottom" sideOffset={8}>
+                           Sign Up
+                        </TooltipContent>
+                     )}
+                  </Tooltip>
+                  <Tooltip delayDuration={0}>
+                     <TooltipTrigger asChild>
+                        <Link
+                           href="/auth/signin"
+                           className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors relative group google-sans"
+                           aria-label="Sign In"
+                        >
+                           <LogIn className="h-5 w-5" />
+                        </Link>
+                     </TooltipTrigger>
+                     {!isMobileSidebar && (
+                        <TooltipContent side="bottom" sideOffset={8}>
+                           Sign In
+                        </TooltipContent>
+                     )}
+                  </Tooltip>
+               </>
             )}
 
             <BookmarksModal

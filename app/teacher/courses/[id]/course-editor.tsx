@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createModule, createLecture, createQuiz, updateCourse } from "@/app/actions/lms-actions";
+import { createModule, createLecture, createQuiz, updateCourse, createQuestion } from "@/app/actions/lms-actions";
 import { toast } from "sonner";
 import { Plus, GripVertical, FileText, HelpCircle, Loader2, Save, Send } from "lucide-react";
 import {
@@ -17,6 +17,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 export function CourseEditor({ course }: { course: any }) {
   const [isSaving, setIsSaving] = useState(false);
@@ -63,6 +70,24 @@ export function CourseEditor({ course }: { course: any }) {
         toast.error("Failed to add lecture");
      } finally {
         setIsLectureLoading(false);
+     }
+  };
+
+  const [newQuiz, setNewQuiz] = useState({ title: "" });
+  const [isQuizLoading, setIsQuizLoading] = useState(false);
+  const handleAddQuiz = async () => {
+     if (!activeModule || !newQuiz.title) return;
+     setIsQuizLoading(true);
+     try {
+        const module = course.modules.find((m: any) => m.id === activeModule);
+        await createQuiz(activeModule, { title: newQuiz.title, order: module.quizzes.length + 1 });
+        toast.success("Quiz added");
+        setNewQuiz({ title: "" });
+        setActiveModule(null);
+     } catch (error) {
+        toast.error("Failed to add quiz");
+     } finally {
+        setIsQuizLoading(false);
      }
   };
 
@@ -123,6 +148,32 @@ export function CourseEditor({ course }: { course: any }) {
                                   </DialogFooter>
                                </DialogContent>
                             </Dialog>
+
+                            <Dialog>
+                               <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline" className="rounded-full h-8" onClick={() => setActiveModule(module.id)}>
+                                     <Plus className="h-4 w-4 mr-1" /> Quiz
+                                  </Button>
+                               </DialogTrigger>
+                               <DialogContent>
+                                  <DialogHeader>
+                                     <DialogTitle>Add New Quiz</DialogTitle>
+                                     <DialogDescription>Create a new quiz for module: {module.title}</DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-4 py-4">
+                                     <div className="space-y-2">
+                                        <Label>Quiz Title</Label>
+                                        <Input placeholder="Enter title" value={newQuiz.title} onChange={(e) => setNewQuiz({title: e.target.value})} />
+                                     </div>
+                                  </div>
+                                  <DialogFooter>
+                                     <Button onClick={handleAddQuiz} disabled={isQuizLoading}>
+                                        {isQuizLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                        Add Quiz
+                                     </Button>
+                                  </DialogFooter>
+                               </DialogContent>
+                            </Dialog>
                          </div>
                       </div>
 
@@ -133,15 +184,14 @@ export function CourseEditor({ course }: { course: any }) {
                                   <FileText className="h-4 w-4 text-primary/70" />
                                   <span className="font-medium">{lecture.title}</span>
                                 </div>
-                                <Button size="icon" variant="ghost" className="opacity-0 group-hover:opacity-100 h-8 w-8 rounded-full">
-                                   <Plus className="h-4 w-4" />
-                                </Button>
                             </div>
                          ))}
                          {module.quizzes.map((quiz: any) => (
-                            <div key={quiz.id} className="flex items-center gap-3 p-3 text-sm bg-card rounded-xl border border-border border-dashed shadow-sm">
-                               <HelpCircle className="h-4 w-4 text-orange-500" />
-                               <span className="font-medium">{quiz.title}</span>
+                            <div key={quiz.id} className="flex items-center justify-between p-3 text-sm bg-card rounded-xl border border-border border-dashed shadow-sm group">
+                               <div className="flex items-center gap-3">
+                                  <HelpCircle className="h-4 w-4 text-orange-500" />
+                                  <span className="font-medium">{quiz.title}</span>
+                               </div>
                             </div>
                          ))}
 
@@ -193,7 +243,7 @@ export function CourseEditor({ course }: { course: any }) {
                  <Button variant="secondary" className="justify-start gap-2 h-11 rounded-full">
                     <Save className="h-4 w-4" /> Save as Draft
                  </Button>
-                 <Button variant="outline" className="justify-start gap-2 h-11 rounded-full">
+                 <Button variant="outline" className="justify-start gap-2 h-11 rounded-full" onClick={() => router.push(`/courses/${course.id}`)}>
                     <Send className="h-4 w-4" /> Preview Course
                  </Button>
               </div>

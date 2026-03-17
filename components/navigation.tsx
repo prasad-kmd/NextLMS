@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import {
   FileText, BookOpen, GitBranch, Newspaper, Home, Menu, X, Mail,
   ChevronLeft, ChevronRight, PanelLeft, Wrench, UserRound, Info, Book,
-  GraduationCap, LayoutDashboard, LogOut
+  GraduationCap, LayoutDashboard, LogOut, LogIn, UserPlus
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -165,16 +165,21 @@ export function Navigation() {
           </nav>
 
           {/* User Profile / Logout section at bottom of sidebar */}
-          {session && (
-             <div className="mt-auto border-t border-border p-3">
-                {renderNavItem({
+          <div className="mt-auto border-t border-border p-3">
+             {session ? (
+                renderNavItem({
                    name: "Sign Out",
                    href: "#",
                    icon: LogOut,
                    onClick: () => signOut()
-                })}
-             </div>
-          )}
+                })
+             ) : (
+                <>
+                   {renderNavItem({ name: "Sign Up", href: "/auth/signup", icon: UserPlus })}
+                   {renderNavItem({ name: "Sign In", href: "/auth/signin", icon: LogIn })}
+                </>
+             )}
+          </div>
 
           {/* Footer */}
           {(!isCollapsed || mobileMenuOpen) && (
