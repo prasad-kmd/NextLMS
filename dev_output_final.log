@@ -19,3 +19,7 @@
  GET /api/auth/session 200 in 66ms
  ✓ Compiled in 942ms (1415 modules)
  ✓ Compiled in 355ms (474 modules)
+ ✓ Compiled in 12.7s (1403 modules)
+ ✓ Compiled in 770ms (474 modules)
+ ✓ Compiled in 509ms (474 modules)
+ ✓ Compiled in 2.7s (474 modules)

@@ -4,20 +4,29 @@ import { CourseEditor } from "./course-editor";
 
 export default async function TeacherCourseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const course = await db.course.findUnique({
-    where: { id },
-    include: {
-      modules: {
-        orderBy: { order: "asc" },
-        include: {
-          lectures: { orderBy: { order: "asc" } },
-          quizzes: { orderBy: { order: "asc" } }
+
+  try {
+    const course = await db.course.findUnique({
+      where: { id },
+      include: {
+        modules: {
+          orderBy: { order: "asc" },
+          include: {
+            lectures: { orderBy: { order: "asc" } },
+            quizzes: { orderBy: { order: "asc" } }
+          }
         }
       }
-    }
-  });
+    });
 
-  if (!course) notFound();
+    if (!course) notFound();
 
-  return <CourseEditor course={course} />;
+    // Serialize dates for Client Component
+    const serializedCourse = JSON.parse(JSON.stringify(course));
+
+    return <CourseEditor course={serializedCourse} />;
+  } catch (error) {
+    console.error("Course Loading Error:", error);
+    throw error; // Let the error boundary handle it
+  }
 }

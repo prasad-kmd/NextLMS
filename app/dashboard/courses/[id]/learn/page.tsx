@@ -4,28 +4,46 @@ import { redirect } from "next/navigation";
 export default async function CourseLearnRedirectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // Find all modules for this course
-  const modules = await db.module.findMany({
-    where: { courseId: id },
-    orderBy: { order: "asc" },
-    include: {
-      lectures: { orderBy: { order: "asc" }, take: 1 },
-      quizzes: { orderBy: { order: "asc" }, take: 1 }
-    }
-  });
+  try {
+    // 1. First, check if there are any lectures in any module of the course
+    const firstLecture = await db.lecture.findFirst({
+      where: {
+        module: {
+          courseId: id
+        }
+      },
+      orderBy: [
+        { module: { order: "asc" } },
+        { order: "asc" }
+      ]
+    });
 
-  if (modules.length > 0) {
-    // Try to find the first module that has either a lecture or a quiz
-    for (const module of modules) {
-      if (module.lectures.length > 0) {
-        return redirect(`/dashboard/courses/${id}/learn/${module.lectures[0].id}`);
-      }
-      if (module.quizzes.length > 0) {
-        return redirect(`/dashboard/courses/${id}/quiz/${module.quizzes[0].id}`);
-      }
+    if (firstLecture) {
+      return redirect(`/dashboard/courses/${id}/learn/${firstLecture.id}`);
     }
+
+    // 2. If no lectures, check for any quizzes
+    const firstQuiz = await db.quiz.findFirst({
+      where: {
+        module: {
+          courseId: id
+        }
+      },
+      orderBy: [
+        { module: { order: "asc" } },
+        { order: "asc" }
+      ]
+    });
+
+    if (firstQuiz) {
+      return redirect(`/dashboard/courses/${id}/quiz/${firstQuiz.id}`);
+    }
+
+    console.warn(`No content found for course ${id}. Redirecting to dashboard.`);
+  } catch (error) {
+    console.error("Redirect logic failed:", error);
   }
 
-  // Fallback if no content is found in any module
+  // Fallback if course is empty or error occurs
   return redirect("/dashboard/student");
 }
