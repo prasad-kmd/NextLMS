@@ -165,7 +165,7 @@ export function FloatingNavbar({ className, isMobileSidebar = false }: FloatingN
                <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
                      <button
-                        onClick={() => signOut()}
+                        onClick={() => signOut({ callbackUrl: "/" })}
                         className="p-2 rounded-full hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors relative group google-sans"
                         aria-label="Sign Out"
                      >

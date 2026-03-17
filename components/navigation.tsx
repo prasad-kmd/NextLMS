@@ -171,7 +171,7 @@ export function Navigation() {
                    name: "Sign Out",
                    href: "#",
                    icon: LogOut,
-                   onClick: () => signOut()
+                   onClick: () => signOut({ callbackUrl: "/" })
                 })
              ) : (
                 <>

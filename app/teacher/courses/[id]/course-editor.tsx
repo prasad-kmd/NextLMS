@@ -17,21 +17,25 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { useRouter } from "next/navigation";
 
 export function CourseEditor({ course }: { course: any }) {
+  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+
+  if (!course) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 border border-dashed rounded-2xl">
+        <p className="text-muted-foreground">Course data not found or failed to load.</p>
+      </div>
+    );
+  }
 
   const handlePublishToggle = async () => {
     try {
       await updateCourse(course.id, { isPublished: !course.isPublished });
       toast.success(course.isPublished ? "Course unpublished" : "Course published");
+      router.refresh();
     } catch (error) {
       toast.error("Action failed");
     }
@@ -41,9 +45,10 @@ export function CourseEditor({ course }: { course: any }) {
   const handleAddModule = async () => {
      if (!newModuleName) return;
      try {
-       await createModule(course.id, { title: newModuleName, order: course.modules.length + 1 });
+       await createModule(course.id, { title: newModuleName, order: (course.modules?.length || 0) + 1 });
        setNewModuleName("");
        toast.success("Module added");
+       router.refresh();
      } catch (error) {
        toast.error("Failed to add module");
      }
@@ -57,15 +62,16 @@ export function CourseEditor({ course }: { course: any }) {
      if (!activeModule || !newLecture.title) return;
      setIsLectureLoading(true);
      try {
-        const module = course.modules.find((m: any) => m.id === activeModule);
+        const module = course.modules?.find((m: any) => m.id === activeModule);
         await createLecture(activeModule, {
            title: newLecture.title,
            content: newLecture.content,
-           order: module.lectures.length + 1
+           order: (module?.lectures?.length || 0) + 1
         });
         toast.success("Lecture added");
         setNewLecture({ title: "", content: "" });
         setActiveModule(null);
+        router.refresh();
      } catch (error) {
         toast.error("Failed to add lecture");
      } finally {
@@ -79,11 +85,12 @@ export function CourseEditor({ course }: { course: any }) {
      if (!activeModule || !newQuiz.title) return;
      setIsQuizLoading(true);
      try {
-        const module = course.modules.find((m: any) => m.id === activeModule);
-        await createQuiz(activeModule, { title: newQuiz.title, order: module.quizzes.length + 1 });
+        const module = course.modules?.find((m: any) => m.id === activeModule);
+        await createQuiz(activeModule, { title: newQuiz.title, order: (module?.quizzes?.length || 0) + 1 });
         toast.success("Quiz added");
         setNewQuiz({ title: "" });
         setActiveModule(null);
+        router.refresh();
      } catch (error) {
         toast.error("Failed to add quiz");
      } finally {
@@ -114,7 +121,7 @@ export function CourseEditor({ course }: { course: any }) {
              </h2>
 
              <div className="space-y-6">
-                {course.modules.map((module: any) => (
+                {(course.modules || []).map((module: any) => (
                    <div key={module.id} className="p-6 rounded-2xl border border-border bg-muted/20 backdrop-blur-sm">
                       <div className="flex items-center justify-between mb-6">
                          <h3 className="font-bold text-lg">{module.title}</h3>
@@ -125,7 +132,7 @@ export function CourseEditor({ course }: { course: any }) {
                                      <Plus className="h-4 w-4 mr-1" /> Lecture
                                   </Button>
                                </DialogTrigger>
-                               <DialogContent className="max-w-2xl">
+                               <DialogContent className="max-w-2xl bg-card">
                                   <DialogHeader>
                                      <DialogTitle>Add New Lecture</DialogTitle>
                                      <DialogDescription>Create a new lecture for module: {module.title}</DialogDescription>
@@ -155,7 +162,7 @@ export function CourseEditor({ course }: { course: any }) {
                                      <Plus className="h-4 w-4 mr-1" /> Quiz
                                   </Button>
                                </DialogTrigger>
-                               <DialogContent>
+                               <DialogContent className="bg-card">
                                   <DialogHeader>
                                      <DialogTitle>Add New Quiz</DialogTitle>
                                      <DialogDescription>Create a new quiz for module: {module.title}</DialogDescription>
@@ -178,7 +185,7 @@ export function CourseEditor({ course }: { course: any }) {
                       </div>
 
                       <div className="space-y-3 ml-4">
-                         {module.lectures.map((lecture: any) => (
+                         {(module.lectures || []).map((lecture: any) => (
                             <div key={lecture.id} className="flex items-center justify-between p-3 text-sm bg-card rounded-xl border border-border shadow-sm group">
                                <div className="flex items-center gap-3">
                                   <FileText className="h-4 w-4 text-primary/70" />
@@ -186,8 +193,8 @@ export function CourseEditor({ course }: { course: any }) {
                                 </div>
                             </div>
                          ))}
-                         {module.quizzes.map((quiz: any) => (
-                            <div key={quiz.id} className="flex items-center justify-between p-3 text-sm bg-card rounded-xl border border-border border-dashed shadow-sm group">
+                         {(module.quizzes || []).map((quiz: any) => (
+                            <div key={quiz.id} className="flex items-center gap-3 p-3 text-sm bg-card rounded-xl border border-border border-dashed shadow-sm group">
                                <div className="flex items-center gap-3">
                                   <HelpCircle className="h-4 w-4 text-orange-500" />
                                   <span className="font-medium">{quiz.title}</span>
@@ -195,7 +202,7 @@ export function CourseEditor({ course }: { course: any }) {
                             </div>
                          ))}
 
-                         {module.lectures.length === 0 && module.quizzes.length === 0 && (
+                         {(module.lectures?.length === 0 && module.quizzes?.length === 0) && (
                             <div className="text-center py-6 text-xs text-muted-foreground border-border border-dashed border rounded-xl">
                                No content in this module yet.
                             </div>
@@ -226,7 +233,7 @@ export function CourseEditor({ course }: { course: any }) {
               <div className="space-y-4">
                  <div className="flex justify-between text-sm py-2 border-b border-border">
                     <span className="text-muted-foreground">Modules</span>
-                    <span className="font-bold">{course.modules.length}</span>
+                    <span className="font-bold">{course.modules?.length || 0}</span>
                  </div>
                  <div className="flex justify-between text-sm py-2 border-b border-border">
                     <span className="text-muted-foreground">Status</span>
