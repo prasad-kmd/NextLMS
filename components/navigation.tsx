@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import {
   FileText, BookOpen, GitBranch, Newspaper, Home, Menu, X, Mail,
   ChevronLeft, ChevronRight, PanelLeft, Wrench, UserRound, Info, Book,
-  GraduationCap, LayoutDashboard
+  GraduationCap, LayoutDashboard, LogOut
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -13,7 +13,7 @@ import { WebShareButton } from "./web-share-button"
 import { PushNotificationManager } from "./push-notification-manager"
 import { useSidebar } from "./sidebar-context"
 import { FloatingNavbar } from "./floating-navbar"
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import {
   Tooltip,
   TooltipContent,
@@ -42,28 +42,37 @@ export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isCollapsed, toggleSidebar } = useSidebar()
 
-  const renderNavItem = (item: { name: string; href: string; icon: React.ElementType }) => {
+  const renderNavItem = (item: { name: string; href: string; icon: React.ElementType, onClick?: () => void }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+
+    const content = (
+      <div
+        className={cn(
+          "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all gap-3 relative group local-jetbrains-mono cursor-pointer",
+          isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          isCollapsed ? "lg:justify-center lg:px-2 lg:gap-0" : "justify-start"
+        )}
+      >
+        <item.icon className="h-5 w-5 shrink-0" />
+        <span className={cn(
+          "transition-opacity duration-300",
+          isCollapsed ? "lg:opacity-0 lg:w-0 lg:overflow-hidden" : "opacity-100"
+        )}>
+          {item.name}
+        </span>
+      </div>
+    );
+
     return (
       <Tooltip key={item.name} delayDuration={0}>
         <TooltipTrigger asChild>
-          <Link
-            href={item.href}
-            onClick={() => setMobileMenuOpen(false)}
-            className={cn(
-              "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all gap-3 relative group local-jetbrains-mono",
-              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              isCollapsed ? "lg:justify-center lg:px-2 lg:gap-0" : "justify-start"
-            )}
-          >
-            <item.icon className="h-5 w-5 shrink-0" />
-            <span className={cn(
-              "transition-opacity duration-300",
-              isCollapsed ? "lg:opacity-0 lg:w-0 lg:overflow-hidden" : "opacity-100"
-            )}>
-              {item.name}
-            </span>
-          </Link>
+          {item.onClick ? (
+            <div onClick={item.onClick}>{content}</div>
+          ) : (
+            <Link href={item.href} onClick={() => setMobileMenuOpen(false)}>
+              {content}
+            </Link>
+          )}
         </TooltipTrigger>
         {isCollapsed && (
           <TooltipContent side="right" className="ml-2">
@@ -154,6 +163,18 @@ export function Navigation() {
             <hr className="my-2 border-border" />
             {secondaryNav.map(renderNavItem)}
           </nav>
+
+          {/* User Profile / Logout section at bottom of sidebar */}
+          {session && (
+             <div className="mt-auto border-t border-border p-3">
+                {renderNavItem({
+                   name: "Sign Out",
+                   href: "#",
+                   icon: LogOut,
+                   onClick: () => signOut()
+                })}
+             </div>
+          )}
 
           {/* Footer */}
           {(!isCollapsed || mobileMenuOpen) && (
