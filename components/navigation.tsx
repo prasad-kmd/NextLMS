@@ -4,7 +4,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   FileText, BookOpen, GitBranch, Newspaper, Home, Menu, X, Mail,
-  ChevronLeft, ChevronRight, PanelLeft, Wrench, UserRound, Info, Book
+  ChevronLeft, ChevronRight, PanelLeft, Wrench, UserRound, Info, Book,
+  GraduationCap, LayoutDashboard, LogOut, LogIn, UserPlus
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -12,6 +13,7 @@ import { WebShareButton } from "./web-share-button"
 import { PushNotificationManager } from "./push-notification-manager"
 import { useSidebar } from "./sidebar-context"
 import { FloatingNavbar } from "./floating-navbar"
+import { useSession, signOut } from "next-auth/react"
 import {
   Tooltip,
   TooltipContent,
@@ -36,31 +38,41 @@ const secondaryNav = [
 
 export function Navigation() {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isCollapsed, toggleSidebar } = useSidebar()
 
-  const renderNavItem = (item: { name: string; href: string; icon: React.ElementType }) => {
+  const renderNavItem = (item: { name: string; href: string; icon: React.ElementType, onClick?: () => void }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+
+    const content = (
+      <div
+        className={cn(
+          "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all gap-3 relative group local-jetbrains-mono cursor-pointer",
+          isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          isCollapsed ? "lg:justify-center lg:px-2 lg:gap-0" : "justify-start"
+        )}
+      >
+        <item.icon className="h-5 w-5 shrink-0" />
+        <span className={cn(
+          "transition-opacity duration-300",
+          isCollapsed ? "lg:opacity-0 lg:w-0 lg:overflow-hidden" : "opacity-100"
+        )}>
+          {item.name}
+        </span>
+      </div>
+    );
+
     return (
       <Tooltip key={item.name} delayDuration={0}>
         <TooltipTrigger asChild>
-          <Link
-            href={item.href}
-            onClick={() => setMobileMenuOpen(false)}
-            className={cn(
-              "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all gap-3 relative group local-jetbrains-mono",
-              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              isCollapsed ? "lg:justify-center lg:px-2 lg:gap-0" : "justify-start"
-            )}
-          >
-            <item.icon className="h-5 w-5 shrink-0" />
-            <span className={cn(
-              "transition-opacity duration-300",
-              isCollapsed ? "lg:opacity-0 lg:w-0 lg:overflow-hidden" : "opacity-100"
-            )}>
-              {item.name}
-            </span>
-          </Link>
+          {item.onClick ? (
+            <div onClick={item.onClick}>{content}</div>
+          ) : (
+            <Link href={item.href} onClick={() => setMobileMenuOpen(false)}>
+              {content}
+            </Link>
+          )}
         </TooltipTrigger>
         {isCollapsed && (
           <TooltipContent side="right" className="ml-2">
@@ -131,12 +143,43 @@ export function Navigation() {
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
             {primaryNav.map(renderNavItem)}
+
+            {session && (
+              <>
+                <hr className="my-2 border-border" />
+                <div className={cn("px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground", isCollapsed && "hidden")}>
+                  LMS
+                </div>
+                {renderNavItem({ name: "Dashboard", href: "/dashboard/student", icon: LayoutDashboard })}
+                {(session.user.role === "ADMIN" || session.user.role === "TEACHER") &&
+                  renderNavItem({ name: "Teaching", href: "/teacher/courses", icon: GraduationCap })
+                }
+              </>
+            )}
+
             <hr className="my-2 border-border" />
             <PushNotificationManager isCollapsed={isCollapsed} />
             <WebShareButton isCollapsed={isCollapsed} />
             <hr className="my-2 border-border" />
             {secondaryNav.map(renderNavItem)}
           </nav>
+
+          {/* User Profile / Logout section at bottom of sidebar */}
+          <div className="mt-auto border-t border-border p-3">
+             {session ? (
+                renderNavItem({
+                   name: "Sign Out",
+                   href: "#",
+                   icon: LogOut,
+                   onClick: () => signOut({ callbackUrl: "/" })
+                })
+             ) : (
+                <>
+                   {renderNavItem({ name: "Sign Up", href: "/auth/signup", icon: UserPlus })}
+                   {renderNavItem({ name: "Sign In", href: "/auth/signin", icon: LogIn })}
+                </>
+             )}
+          </div>
 
           {/* Footer */}
           {(!isCollapsed || mobileMenuOpen) && (

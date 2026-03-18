@@ -1,7 +1,7 @@
 "use client"
 
 import { useTheme } from "next-themes"
-import { Sun, Moon, Bookmark, Share2, LayoutGrid } from "lucide-react"
+import { Sun, Moon, Bookmark, Share2, LayoutGrid, LogIn, LogOut, User, UserPlus } from "lucide-react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -9,6 +9,7 @@ import { Search } from "./search"
 import { BookmarksModal } from "./bookmarks-modal"
 import { useBookmarks } from "@/hooks/use-bookmarks"
 import { toast } from "sonner"
+import { useSession, signOut } from "next-auth/react"
 import {
     Tooltip,
     TooltipContent,
@@ -26,6 +27,7 @@ export function FloatingNavbar({ className, isMobileSidebar = false }: FloatingN
     const [isBookmarksOpen, setIsBookmarksOpen] = useState(false)
     const { bookmarks } = useBookmarks()
     const [copied, setCopied] = useState(false)
+    const { data: session } = useSession()
 
     // Avoid hydration mismatch
     useEffect(() => {
@@ -156,6 +158,63 @@ export function FloatingNavbar({ className, isMobileSidebar = false }: FloatingN
                     </TooltipContent>
                 )}
             </Tooltip>
+
+            <hr className="h-4 w-[1px] bg-border mx-1" />
+
+            {session ? (
+               <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                     <button
+                        onClick={() => signOut({ callbackUrl: "/" })}
+                        className="p-2 rounded-full hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors relative group google-sans"
+                        aria-label="Sign Out"
+                     >
+                        <LogOut className="h-5 w-5" />
+                     </button>
+                  </TooltipTrigger>
+                  {!isMobileSidebar && (
+                     <TooltipContent side="bottom" sideOffset={8}>
+                        Sign Out ({session.user?.name || "User"})
+                     </TooltipContent>
+                  )}
+               </Tooltip>
+            ) : (
+               <>
+                  <Tooltip delayDuration={0}>
+                     <TooltipTrigger asChild>
+                        <Link
+                           href="/auth/signup"
+                           className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors relative group google-sans"
+                           aria-label="Sign Up"
+                        >
+                           <UserPlus className="h-5 w-5" />
+                        </Link>
+                     </TooltipTrigger>
+                     {!isMobileSidebar && (
+                        <TooltipContent side="bottom" sideOffset={8}>
+                           Sign Up
+                        </TooltipContent>
+                     )}
+                  </Tooltip>
+                  <Tooltip delayDuration={0}>
+                     <TooltipTrigger asChild>
+                        <Link
+                           href="/auth/signin"
+                           className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors relative group google-sans"
+                           aria-label="Sign In"
+                        >
+                           <LogIn className="h-5 w-5" />
+                        </Link>
+                     </TooltipTrigger>
+                     {!isMobileSidebar && (
+                        <TooltipContent side="bottom" sideOffset={8}>
+                           Sign In
+                        </TooltipContent>
+                     )}
+                  </Tooltip>
+               </>
+            )}
+
             <BookmarksModal
                 isOpen={isBookmarksOpen}
                 onClose={() => setIsBookmarksOpen(false)}
